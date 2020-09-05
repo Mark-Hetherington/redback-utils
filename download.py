@@ -8,6 +8,8 @@ import os
 login_url = "https://portal.redbacktech.com/Account/Login"
 data_url = "https://portal.redbacktech.com/charts/GetDataBands?StartDate={:%d/%m/%Y}&EndDate={:%d/%m/%Y}&serialNumber={}&timezone=AUS%20Eastern%20Standard%20Time"
 
+data_directory = "data"
+
 command_text = """
 {0} -e <email> -p <password> -s <serial>
 e.g. {0} -e test@example.org -p 12345678 -s RB17123456789012
@@ -47,12 +49,13 @@ class Extractor:
         # Spoof user agent
         # self.s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36"
         self.login()
-        os.mkdir('output')
+        if not os.path.exists(data_directory):
+            os.mkdir(data_directory)
         for i in range(1, 366):
             date = datetime.date.today() - timedelta(days=i)
             print("Downloading {}".format(date))
             result = self.getforDate(datetime.date.today())
-            with open("output/{:%Y-%m-%d}.json".format(date), "w") as f:
+            with open(os.path.join(data_directory, "data/{:%Y-%m-%d}.json".format(date)), "w") as f:
                 f.write(result.decode())
 
 
