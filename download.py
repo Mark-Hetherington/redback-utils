@@ -5,10 +5,6 @@ import sys, getopt
 from bs4 import BeautifulSoup
 import os
 
-login_url = "https://portal.redbacktech.com/Account/Login"
-data_url = "https://portal.redbacktech.com/charts/GetDataBands?StartDate={:%d/%m/%Y}&EndDate={:%d/%m/%Y}&serialNumber={}&timezone=AUS%20Eastern%20Standard%20Time"
-
-data_directory = "data"
 
 command_text = """
 {0} -e <email> -p <password> -s <serial>
