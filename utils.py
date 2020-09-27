@@ -30,7 +30,8 @@ def load_all_data(limit=None):
         try:
             item = load_pandas(os.path.join(data_directory, filename))
             # Resample to minute resolution otherwise timestamps won't line up
-            dfs.append(item.resample('T').mean())
+            #dfs.append(item.resample('10T').mean())
+            dfs.append(item)
         except KeyError:
             pass  # Probably empty datafile
 
