@@ -4,7 +4,9 @@ from datetime import timedelta
 import sys, getopt
 from bs4 import BeautifulSoup
 import os
+import time
 
+from constants import data_directory, login_url, data_url
 
 command_text = """
 {0} -e <email> -p <password> -s <serial>
@@ -50,8 +52,8 @@ class Extractor:
         for i in range(1, 366):
             date = datetime.date.today() - timedelta(days=i)
             print("Downloading {}".format(date))
-            result = self.getforDate(datetime.date.today())
-            with open(os.path.join(data_directory, "data/{:%Y-%m-%d}.json".format(date)), "w") as f:
+            result = self.getforDate(date)
+            with open(os.path.join(data_directory, "{:%Y-%m-%d}.json".format(date)), "w") as f:
                 f.write(result.decode())
 
 
@@ -66,8 +68,9 @@ class Extractor:
         r.raise_for_status()
 
     def getforDate(self, date):
-        url = data_url.format(date, date, self.serial)
+        url = data_url.format(date, date, self.serial, time.time())
         r = self.s.get(url)
+
         return r.content
 
 
