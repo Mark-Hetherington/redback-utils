@@ -53,8 +53,11 @@ class Extractor:
             date = datetime.date.today() - timedelta(days=i)
             print("Downloading {}".format(date))
             result = self.getforDate(date)
-            with open(os.path.join(data_directory, "{:%Y-%m-%d}.json".format(date)), "w") as f:
-                f.write(result.decode())
+            if len(result) > 2000:
+                with open(os.path.join(data_directory, "{:%Y-%m-%d}.json".format(date)), "w") as f:
+                    f.write(result.decode())
+            else:
+                print("Skipping - data length: %d" % len(result))
 
 
     def login(self):
