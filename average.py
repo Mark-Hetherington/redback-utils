@@ -6,7 +6,8 @@ from constants import *
 from utils import load_pandas, load_all_data
 import pandas as pd
 
-data = load_all_data()
+
+data = load_all_data(limit=60)
 by_time = data.groupby(data.index.time).mean()
 
 if not os.path.exists(output_directory):
