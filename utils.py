@@ -3,6 +3,8 @@ import json
 import os
 
 from constants import data_directory
+import pytz
+sydney_tz = pytz.timezone('Australia/Sydney')
 
 
 def load_pandas(filename):
@@ -15,6 +17,8 @@ def load_pandas(filename):
     else:
         df = pandas.read_json(filename)
     df.index = pandas.to_datetime(df['Epoch'], unit='s')
+    df.index = df.index.tz_localize(pytz.utc).tz_convert(sydney_tz)
+
     return df
 
 
