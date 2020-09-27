@@ -8,6 +8,8 @@ import pandas as pd
 
 
 data = load_all_data(limit=60)
+data = data.resample('T').mean()
+
 by_time = data.groupby(data.index.time).mean()
 
 if not os.path.exists(output_directory):
