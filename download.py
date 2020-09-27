@@ -49,7 +49,7 @@ class Extractor:
         self.login()
         if not os.path.exists(data_directory):
             os.mkdir(data_directory)
-        for i in range(1, 366):
+        for i in range(1, 731):
             date = datetime.date.today() - timedelta(days=i)
             print("Downloading {}".format(date))
             result = self.getforDate(date)
