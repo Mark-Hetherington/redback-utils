@@ -2,18 +2,21 @@ import matplotlib.pyplot as plt
 
 # Produces an "average" day from all the data.
 from utils import load_pandas, load_all_data
+import pandas
 
 
-data = load_all_data(limit=60)
+data = load_all_data()
+data['Battery.P'] = pandas.to_numeric(data['Battery.P'])
 data = data.resample('T').mean()
 
 by_time = data.groupby(data.index.time).mean()
-print("total samples:%d, grouped samples %d" % (len(data.index),len(by_time.index)))
+print("total samples:%d, grouped samples %d" % (len(data.index), len(by_time.index)))
 
 #df.index = df.index.time
 by_time['ACLoad.P'].plot(label="ACLOAD", zorder=1)
 by_time['PV.P'].plot(label="PV", zorder=1)
-#by_time['Battery.P'].plot(label="Battery", zorder=1)
+by_time['Grid.P'].plot(label="Grid", zorder=1)
+by_time['Battery.P'].plot(label="Battery", zorder=1)
 
 # multiple line plot
 # plt.plot('Date', 'ACLoad.P', data=df)
