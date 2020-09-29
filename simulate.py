@@ -13,9 +13,8 @@ data = resample_dataframe(data, 'T')
 data = data.interpolate(method='index')
 
 # for each minute of data, extrapolate new values
-simulation_soc = None
+simulation_soc = battery_soc_min * battery_capacity/100  # Assume fully discharged to start simulation
 for index, row in data.iterrows():
-    simulation_soc = simulation_soc or row['Battery.SoC'] * battery_capacity/100
     max_pv_power = row['PV.P'] * 2
     battery_power = max_pv_power - row['ACLoad.P']
     battery_power = min(max(battery_power, -battery_discharge_limit), battery_charge_limit)
