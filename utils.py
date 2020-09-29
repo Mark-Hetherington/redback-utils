@@ -23,6 +23,7 @@ def load_pandas(filename):
 
 
 def load_all_data(limit=None):
+    limit = limit + 1 if limit else None
     dfs = []
 
     for filename in os.listdir(data_directory):
