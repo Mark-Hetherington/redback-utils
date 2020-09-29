@@ -42,3 +42,18 @@ def load_all_data(limit=None):
 
     data = pandas.concat(dfs)
     return data
+
+
+def convert_columns_to_numeric(dataframe):
+    dataframe['Battery.P'] = pandas.to_numeric(dataframe['Battery.P'])
+    dataframe['Battery.SoC'] = pandas.to_numeric(dataframe['Battery.SoC'])
+
+
+def resample_dataframe(dataframe, unit):
+    convert_columns_to_numeric(dataframe)
+    return dataframe.resample('T').mean()
+
+
+def kW_series_to_kWh(series):
+    return series.sum()/1000/60
+
