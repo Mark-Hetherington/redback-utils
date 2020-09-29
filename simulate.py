@@ -7,7 +7,7 @@ export_limit = 5000  # Export limit is 5kw
 battery_charge_limit = 8000  # battery charge rate is limited to 8kw
 battery_discharge_limit = 8000  # battery charge rate is limited to 8kw
 battery_soc_min = 15  # Battery limited to 15% state of charge
-data = load_all_data(limit=5)
+data = load_all_data()
 # data = load_pandas('data/2018-12-26.json')
 data = resample_dataframe(data, 'T')
 data = data.interpolate(method='index')
@@ -40,7 +40,7 @@ for index, row in data.iterrows():
 print("PV generation: %d kWh" % kW_series_to_kWh(data['PV.P']))
 print("Total spill: %d kWh" % kW_series_to_kWh(data['simulation.Spill.P']))
 # Convert to an mean day
-# data = data.groupby(data.index.time).mean()
+data = data.groupby(data.index.time).mean()
 data["ACLoad.P"].plot(label="Load")
 data["simulation.PV.P"].plot(label="PV")
 # data["PV.P"].plot()
