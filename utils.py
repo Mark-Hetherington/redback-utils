@@ -8,7 +8,7 @@ import pytz
 sydney_tz = pytz.timezone('Australia/Sydney')
 
 
-def load_pandas(filename):
+def load_json(filename):
     # TODO: We are going to want to translate the data into usable series
     with open(filename) as data_file:
         data = json.load(data_file)
@@ -43,7 +43,7 @@ def load_all_json_data(limit=None):
                     break
             print('Reading {}'.format(filename))
             try:
-                item = load_pandas(os.path.join(data_directory, filename))
+                item = load_json(os.path.join(data_directory, filename))
                 # Resample to minute resolution otherwise timestamps won't line up
                 # dfs.append(item.resample('10T').mean())
                 dfs.append(item)

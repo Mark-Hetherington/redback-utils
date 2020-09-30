@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 
 from constants import data_directory
-from utils import load_pandas
+from utils import load_json
 import numpy as np
 import pandas as pd
 from datetime import date, timedelta
@@ -12,7 +12,7 @@ import os
 # df = pd.DataFrame({'x': range(1, 11), 'y1': np.random.randn(10), 'y2': np.random.randn(10) + range(1, 11),
 #                    'y3': np.random.randn(10) + range(11, 21)})
 
-df = load_pandas('output/average.json')
+df = load_json('output/average.json')
 # df = load_pandas('data/2019-09-07.json')
 df.index = df.index.time
 df['ACLoad.P'].plot(label="ACLOAD", zorder=1)

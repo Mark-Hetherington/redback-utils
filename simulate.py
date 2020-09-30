@@ -1,7 +1,7 @@
 import os
 
 from constants import output_directory
-from utils import load_all_json_data, load_pandas, resample_dataframe, kW_series_to_kWh, print_progress_bar, \
+from utils import load_all_json_data, load_json, resample_dataframe, kW_series_to_kWh, print_progress_bar, \
     load_all_byminute_data
 import matplotlib.pyplot as plt
 
@@ -75,16 +75,16 @@ if __name__ == "__main__":
     simulated_data = simulator.simulate()
     simulated_data.to_hdf(os.path.join(output_directory, "simulation.h5"), 'table')
     # # Convert to a mean day
-    # simulated_data = simulated_data.groupby(data.index.time).mean()
-    # simulated_data.to_hdf(os.path.join(output_directory, "simulation-mean-day.h5"), 'table')
-    # data["ACLoad.P"].plot(label="Load")
-    # data["simulation.PV.P"].plot(label="PV")
-    # # data["PV.P"].plot()
-    # # data['Grid.P'].plot()
-    # # data['simulation.Battery.P'].plot(label="Battery")
-    # data['simulation.Battery.SoC'].plot(label="SoC", secondary_y=True)
-    # data['simulation.Grid.P'].plot(label="Grid")
-    # ax = data['simulation.Spill.P'].plot(label="Spill")
-    # plt.legend()
-    # ax.legend(loc="upper left")
-    # plt.show()
+    simulated_data = simulated_data.groupby(data.index.time).mean()
+    simulated_data.to_hdf(os.path.join(output_directory, "simulation-mean-day.h5"), 'table')
+    data["ACLoad.P"].plot(label="Load")
+    data["simulation.PV.P"].plot(label="PV")
+    # data["PV.P"].plot()
+    # data['Grid.P'].plot()
+    # data['simulation.Battery.P'].plot(label="Battery")
+    data['simulation.Battery.SoC'].plot(label="SoC", secondary_y=True)
+    data['simulation.Grid.P'].plot(label="Grid")
+    ax = data['simulation.Spill.P'].plot(label="Spill")
+    plt.legend()
+    ax.legend(loc="upper left")
+    plt.show()
