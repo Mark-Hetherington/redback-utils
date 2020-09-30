@@ -7,7 +7,7 @@ export_limit = 5000  # Export limit is 5kw
 battery_charge_limit = 8000  # battery charge rate is limited to 8kw
 battery_discharge_limit = 8000  # battery charge rate is limited to 8kw
 battery_soc_min = 15  # Battery limited to 15% state of charge
-data = load_all_data()
+data = load_all_json_data(limit=10)
 # data = load_pandas('data/2018-12-26.json')
 data = resample_dataframe(data, 'T')
 data = data.interpolate(method='index')

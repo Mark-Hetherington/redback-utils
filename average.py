@@ -3,11 +3,11 @@ import os
 
 # Produces an "average" day from all the data.
 from constants import output_directory
-from utils import load_pandas, load_all_data, resample_dataframe
+from utils import load_pandas, load_all_json_data, resample_dataframe
 import pandas
 
 
-data = load_all_data()
+data = load_all_json_data()
 data = resample_dataframe(data, 'T')
 
 by_time = data.groupby(data.index.time).mean()

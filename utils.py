@@ -23,7 +23,7 @@ def load_pandas(filename):
     return df
 
 
-def load_all_data(limit=None):
+def load_all_json_data(limit=None):
     limit = limit + 1 if limit else None
     dfs = []
 
