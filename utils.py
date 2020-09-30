@@ -36,18 +36,19 @@ def load_all_json_data(limit=None):
     dfs = []
 
     for filename in os.listdir(data_directory):
-        if limit:
-            limit -= 1
-            if limit == 0:
-                break
-        print('Reading {}'.format(filename))
-        try:
-            item = load_pandas(os.path.join(data_directory, filename))
-            # Resample to minute resolution otherwise timestamps won't line up
-            # dfs.append(item.resample('10T').mean())
-            dfs.append(item)
-        except KeyError:
-            pass  # Probably empty datafile
+        if filename.endswith(".json"):
+            if limit:
+                limit -= 1
+                if limit == 0:
+                    break
+            print('Reading {}'.format(filename))
+            try:
+                item = load_pandas(os.path.join(data_directory, filename))
+                # Resample to minute resolution otherwise timestamps won't line up
+                # dfs.append(item.resample('10T').mean())
+                dfs.append(item)
+            except KeyError:
+                pass  # Probably empty datafile
 
     data = pandas.concat(dfs)
     return data
