@@ -1,4 +1,4 @@
-from utils import load_all_data, load_pandas, resample_dataframe, kW_series_to_kWh
+from utils import load_all_data, load_pandas, resample_dataframe, kW_series_to_kWh, print_progress_bar
 import matplotlib.pyplot as plt
 
 multiply_PV = 2  # Increase solar by a factor of 2
@@ -12,8 +12,13 @@ data = load_all_data()
 data = resample_dataframe(data, 'T')
 data = data.interpolate(method='index')
 
-# for each minute of data, extrapolate new values
 simulation_soc = battery_soc_min * battery_capacity/100  # Assume fully discharged to start simulation
+
+# for each minute of data, extrapolate new values
+print("Simulating data on %d rows" % data['Epoch'].count())
+row_index = 0
+row_total = data['Epoch'].count()
+
 for index, row in data.iterrows():
     max_pv_power = row['PV.P'] * 2
     battery_power = max_pv_power - row['ACLoad.P']
@@ -35,7 +40,8 @@ for index, row in data.iterrows():
     data.at[index, 'simulation.Battery.SoC'] = simulation_soc/battery_capacity*100
     data.at[index, 'simulation.Grid.P'] = grid_power
     data.at[index, 'simulation.Spill.P'] = pv_spill
-    #print(row)
+    row_index += 1
+    print_progress_bar(row_index, row_total)
 
 print("PV generation: %d kWh" % kW_series_to_kWh(data['PV.P']))
 print("Total spill: %d kWh" % kW_series_to_kWh(data['simulation.Spill.P']))
