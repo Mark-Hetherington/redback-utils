@@ -23,6 +23,14 @@ def load_pandas(filename):
     return df
 
 
+def load_all_data():
+    return pandas.read_hdf(os.path.join(data_directory, "all.h5"))
+
+
+def load_all_byminute_data():
+    return pandas.read_hdf(os.path.join(data_directory, "byminute.h5"))
+
+
 def load_all_json_data(limit=None):
     limit = limit + 1 if limit else None
     dfs = []
