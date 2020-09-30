@@ -24,11 +24,11 @@ def load_pandas(filename):
 
 
 def load_all_data():
-    return pandas.read_hdf(os.path.join(data_directory, "all.h5"))
+    return pandas.read_hdf(os.path.join(data_directory, "all.h5"), 'table')
 
 
 def load_all_byminute_data():
-    return pandas.read_hdf(os.path.join(data_directory, "byminute.h5"))
+    return pandas.read_hdf(os.path.join(data_directory, "byminute.h5"), 'table')
 
 
 def load_all_json_data(limit=None):
