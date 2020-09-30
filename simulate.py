@@ -45,6 +45,8 @@ for index, row in data.iterrows():
 
 print("PV generation: %d kWh" % kW_series_to_kWh(data['PV.P']))
 print("Total spill: %d kWh" % kW_series_to_kWh(data['simulation.Spill.P']))
+print("Total exports: %d kWh" % kW_series_to_kWh(data['simulation.Grid.P'].clip(lower=0)))
+print("Total imports: %d kWh" % kW_series_to_kWh(data['simulation.Grid.P'].clip(upper=0)))
 # Convert to an mean day
 data = data.groupby(data.index.time).mean()
 data["ACLoad.P"].plot(label="Load")
