@@ -23,12 +23,23 @@ def load_json(filename):
     return df
 
 
+def load_hdf(filename):
+    return pandas.read_hdf(filename, 'table')
+
+
+def load_file(filename):
+    if filename.endswith('.json'):
+        return load_json(filename)
+    else:
+        return load_hdf(filename)
+
+
 def load_all_data():
-    return pandas.read_hdf(os.path.join(data_directory, "all.h5"), 'table')
+    return load_hdf(os.path.join(data_directory, "all.h5"))
 
 
 def load_all_byminute_data():
-    return pandas.read_hdf(os.path.join(data_directory, "byminute.h5"), 'table')
+    return load_hdf(os.path.join(data_directory, "byminute.h5"))
 
 
 def load_all_json_data(limit=None):
