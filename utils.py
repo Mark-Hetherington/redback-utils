@@ -4,6 +4,7 @@ import os
 
 from constants import data_directory
 import pytz
+
 sydney_tz = pytz.timezone('Australia/Sydney')
 
 
@@ -35,7 +36,7 @@ def load_all_data(limit=None):
         try:
             item = load_pandas(os.path.join(data_directory, filename))
             # Resample to minute resolution otherwise timestamps won't line up
-            #dfs.append(item.resample('10T').mean())
+            # dfs.append(item.resample('10T').mean())
             dfs.append(item)
         except KeyError:
             pass  # Probably empty datafile
@@ -44,21 +45,34 @@ def load_all_data(limit=None):
     return data
 
 
-def convert_columns_to_numeric(dataframe):
-    dataframe['Battery.P'] = pandas.to_numeric(dataframe['Battery.P'])
-    dataframe['Battery.SoC'] = pandas.to_numeric(dataframe['Battery.SoC'])
+def convert_columns_types(dataframe):
+    numeric_columns = ['ACLoad.Phases', 'BackupLoad.Phases', 'Grid.Phases',
+                       'Battery.SoC', 'Battery.I', 'Battery.P',
+                       'Battery.V', 'Battery.Phases', 'BatteryCabinet.Temperature',
+                       'BatteryCabinet.FanState',
+                       'BatteryMeasurements.Phases',
+                       'ConnectionStatus.WiFiSignalStrength']
+    boolean_columns = ['OuijaBoard.CTComms']
+    # unknown_columns = ['Battery.Batteries', 'PV.PVs']
+    for column in numeric_columns:
+        if column in dataframe:
+            dataframe[column] = pandas.to_numeric(dataframe[column])
+
+    for column in boolean_columns:
+        if column in dataframe:
+            dataframe[column] = dataframe[column].astype('bool')
 
 
 def resample_dataframe(dataframe, unit):
-    convert_columns_to_numeric(dataframe)
+    convert_columns_types(dataframe)
     return dataframe.resample('T').mean()
 
 
 def kW_series_to_kWh(series):
-    return series.sum()/1000/60
+    return series.sum() / 1000 / 60
 
 
-def print_progress_bar (iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd = ""):
+def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd=""):
     """
     Call in a loop to create terminal progress bar
     @params:
@@ -74,7 +88,7 @@ def print_progress_bar (iteration, total, prefix='', suffix='', decimals=1, leng
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
-    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
+    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end=printEnd)
     # Print New Line on Complete
     if iteration == total:
         print()
