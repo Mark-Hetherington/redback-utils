@@ -1,3 +1,4 @@
+import pandas
 import os
 
 from constants import output_directory
@@ -79,7 +80,6 @@ class Simulator:
             row_index += 1
             print_progress_bar(row_index, row_total)
 
-        simulation_stats(data)
         return data
 
 
@@ -122,16 +122,42 @@ simulations = [
     }
 ]
 
+for pv_size in range(10, 40, 5):
+    for battery_size in range(10000, 50000, 10000):
+        for feed_in_tariff in [7, 14, 21]:
+            simulations.append({
+                "name": "pv-%.2f-battery-%d-fit-%d" % (pv_size/10.0, battery_size, feed_in_tariff),
+                "multiply_PV": pv_size/10.0,
+                "battery_capacity": battery_size,
+                "export_limit": 5000,
+                "battery_charge_limit": 7000 if battery_size > 1000 else 4000,
+                "battery_discharge_limit": 7000 if battery_size > 1000 else 4000,
+                "battery_soc_min": 20,
+                "feed_in_tariff": feed_in_tariff
+            })
+
 if __name__ == "__main__":
     print("Loading data")
     data = load_interpolated_byminute_data()
     # data = load_all_json_data(limit=10)
     simulator = Simulator(data)
+    overall_stats = []
     for simulation in simulations:
         name = simulation.pop('name')
         print("Running simulation '%s'" % name)
         simulated_data = simulator.simulate(**simulation)
+        stats = simulation_stats(simulated_data)
+        stats['name'] = name
+        stats['PV-size'] = simulation['multiply_PV']
+        stats['battery-size'] = simulation['battery_capacity']
+        stats['fit'] = simulation.get('feed_in_tariff', 7)
+        overall_stats.append(stats)
         simulated_data.to_hdf(os.path.join(output_directory, "simulation-%s.h5" % name), 'table')
         # # Convert to a mean day
         simulated_data = simulated_data.groupby(data.index.time).mean()
         simulated_data.to_hdf(os.path.join(output_directory, "simulation-mean-day-%s.h5" % name), 'table')
+
+    stats_df = pandas.DataFrame(overall_stats)
+    stats_df.plot.scatter(x='PV-size', y='battery-size', c='cost')
+    stats_df.to_json(os.path.join(output_directory, "simulation-stats.json"))
+    stats_df.to_csv(os.path.join(output_directory, "simulation-stats.csv"))
