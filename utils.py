@@ -2,6 +2,8 @@ import pandas
 import json
 import os
 
+import matplotlib.pyplot as plt
+
 from constants import data_directory
 import pytz
 
@@ -40,6 +42,10 @@ def load_all_data():
 
 def load_all_byminute_data():
     return load_hdf(os.path.join(data_directory, "byminute.h5"))
+
+
+def load_interpolated_byminute_data():
+    return load_hdf(os.path.join(data_directory, "byminute-interpolated.h5"))
 
 
 def load_all_json_data(limit=None):
@@ -112,3 +118,26 @@ def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, lengt
     # Print New Line on Complete
     if iteration == total:
         print()
+
+
+def simulation_stats(data):
+    print("PV generation: %d kWh" % kW_series_to_kWh(data['PV.P']))
+    print("Total spill: %d kWh" % kW_series_to_kWh(data['simulation.Spill.P']))
+    print("Total exports: %d kWh" % kW_series_to_kWh(data['simulation.Grid.P'].clip(lower=0)))
+    print("Total imports: %d kWh" % kW_series_to_kWh(data['simulation.Grid.P'].clip(upper=0)))
+    if 'simulation.cost' in data:
+        print("Total electricity tariffs: $%.2f" % (data['simulation.cost'].sum()/100))
+
+
+def plot_simulation(df):
+    df["ACLoad.P"].plot(label="Load")
+    df["simulation.PV.P"].plot(label="PV")
+    # data["PV.P"].plot()
+    # data['Grid.P'].plot()
+    # data['simulation.Battery.P'].plot(label="Battery")
+    df['simulation.Battery.SoC'].plot(label="SoC", secondary_y=True)
+    df['simulation.Grid.P'].plot(label="Grid")
+    ax = df['simulation.Spill.P'].plot(label="Spill")
+    plt.legend()
+    ax.legend(loc="upper left")
+    plt.show()
