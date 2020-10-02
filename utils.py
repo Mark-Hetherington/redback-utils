@@ -121,12 +121,21 @@ def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, lengt
 
 
 def simulation_stats(data):
-    print("PV generation: %d kWh" % kW_series_to_kWh(data['PV.P']))
-    print("Total spill: %d kWh" % kW_series_to_kWh(data['simulation.Spill.P']))
-    print("Total exports: %d kWh" % kW_series_to_kWh(data['simulation.Grid.P'].clip(lower=0)))
-    print("Total imports: %d kWh" % kW_series_to_kWh(data['simulation.Grid.P'].clip(upper=0)))
+    stats = {
+        "PV": kW_series_to_kWh(data['simulation.PV.P']),
+        'spill': kW_series_to_kWh(data['simulation.Spill.P']),
+        'exports': kW_series_to_kWh(data['simulation.Grid.P'].clip(lower=0)),
+        'imports': kW_series_to_kWh(data['simulation.Grid.P'].clip(upper=0))
+    }
     if 'simulation.cost' in data:
-        print("Total electricity tariffs: $%.2f" % (data['simulation.cost'].sum()/100))
+        stats['cost'] = data['simulation.cost'].sum()/100
+    print("PV generation: %d kWh" % stats['PV'])
+    print("Total spill: %d kWh" % stats['spill'])
+    print("Total exports: %d kWh" % stats['exports'])
+    print("Total imports: %d kWh" % stats['imports'])
+    if 'cost' in stats:
+        print("Total electricity tariffs: $%.2f" % stats['cost'])
+    return stats
 
 
 def plot_simulation(df):
