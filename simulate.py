@@ -21,7 +21,7 @@ class Simulator:
         battery_charge_limit = battery_charge_limit or 4000  # battery charge rate is limited to 8kw
         battery_discharge_limit = battery_discharge_limit or 4000  # battery charge rate is limited to 8kw
         battery_soc_min = battery_soc_min or 15  # Battery limited to 15% state of charge
-        feed_in_tariff = feed_in_tariff or 7  # Feed in tariff is 14.7c/kWh
+        feed_in_tariff = feed_in_tariff or 7  # Feed in tariff is 7c/kWh
         tariffs = tariffs or POWERSHOP_EV_TARIFF
         data = self.data.copy()
 
