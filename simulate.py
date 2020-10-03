@@ -123,7 +123,7 @@ simulations = [
 ]
 
 for pv_size in range(10, 45, 5):
-    for battery_size in range(10000, 50000, 10000):
+    for battery_size in range(10000, 60000, 10000):
         for feed_in_tariff in [7, 14, 21]:
             simulations.append({
                 "name": "pv-%.2f-battery-%d-fit-%d" % (pv_size/10.0, battery_size, feed_in_tariff),
