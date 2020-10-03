@@ -158,6 +158,6 @@ if __name__ == "__main__":
         simulated_data.to_hdf(os.path.join(output_directory, "simulation-mean-day-%s.h5" % name), 'table')
 
     stats_df = pandas.DataFrame(overall_stats)
-    stats_df.plot.scatter(x='PV-size', y='battery-size', c='cost')
+    # stats_df.plot.scatter(x='PV-size', y='battery-size', c='cost')
     stats_df.to_json(os.path.join(output_directory, "simulation-stats.json"))
     stats_df.to_csv(os.path.join(output_directory, "simulation-stats.csv"))
