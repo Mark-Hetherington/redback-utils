@@ -89,9 +89,9 @@ def convert_columns_types(dataframe):
             dataframe[column] = dataframe[column].astype('bool')
 
 
-def resample_dataframe(dataframe, unit):
+def resample_dataframe(dataframe, unit='T'):
     convert_columns_types(dataframe)
-    return dataframe.resample('T').mean()
+    return dataframe.resample(unit).mean()
 
 
 def kW_series_to_kWh(series):
