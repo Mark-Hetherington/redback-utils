@@ -120,17 +120,25 @@ def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, lengt
         print()
 
 
-def simulation_stats(data):
-    stats = {
-        "PV": kW_series_to_kWh(data['simulation.PV.P']),
-        'spill': kW_series_to_kWh(data['simulation.Spill.P']),
-        'exports': kW_series_to_kWh(data['simulation.Grid.P'].clip(lower=0)),
-        'imports': kW_series_to_kWh(data['simulation.Grid.P'].clip(upper=0))
-    }
+def dataset_stats(data):
+    if 'simulation.PV.P' in data:
+        stats = {
+            "PV": kW_series_to_kWh(data['simulation.PV.P']),
+            'spill': kW_series_to_kWh(data['simulation.Spill.P']),
+            'exports': kW_series_to_kWh(data['simulation.Grid.P'].clip(lower=0)),
+            'imports': kW_series_to_kWh(data['simulation.Grid.P'].clip(upper=0))
+        }
+    else:
+        stats = {
+            "PV": kW_series_to_kWh(data['PV.P']),
+            'exports': kW_series_to_kWh(data['Grid.P'].clip(lower=0)),
+            'imports': kW_series_to_kWh(data['Grid.P'].clip(upper=0))
+        }
     if 'simulation.cost' in data:
         stats['cost'] = data['simulation.cost'].sum()/100
     print("PV generation: %d kWh" % stats['PV'])
-    print("Total spill: %d kWh" % stats['spill'])
+    if 'spill' in stats:
+        print("Total spill: %d kWh" % stats['spill'])
     print("Total exports: %d kWh" % stats['exports'])
     print("Total imports: %d kWh" % stats['imports'])
     if 'cost' in stats:

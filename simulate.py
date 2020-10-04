@@ -4,7 +4,7 @@ import os
 from constants import output_directory
 from tariffs import POWERSHOP_EV_TARIFF
 from utils import load_all_json_data, load_json, resample_dataframe, kW_series_to_kWh, print_progress_bar, \
-    load_all_byminute_data, load_interpolated_byminute_data, simulation_stats
+    load_all_byminute_data, load_interpolated_byminute_data, dataset_stats
 
 
 class Simulator:
@@ -22,7 +22,6 @@ class Simulator:
         battery_charge_limit = battery_charge_limit or 4000  # battery charge rate is limited to 8kw
         battery_discharge_limit = battery_discharge_limit or 4000  # battery charge rate is limited to 8kw
         battery_soc_min = battery_soc_min or 15  # Battery limited to 15% state of charge
-        feed_in_tariff = feed_in_tariff or 7  # Feed in tariff is 7c/kWh
         tariffs = tariffs or POWERSHOP_EV_TARIFF
         data = self.data.copy()
 
@@ -56,7 +55,7 @@ class Simulator:
             pv_spill = max_pv_power - pv_power
 
             # TODO: Calculate energy tariff cost
-            cost = 0
+
             grid_Wh = grid_power / 60  # convert to watt hours instead of watt minutes
             grid_kWh = grid_Wh / 1000
             if grid_power < 0:
@@ -69,7 +68,7 @@ class Simulator:
                 else:
                     raise ValueError("No tariff found")
             else:
-                cost = feed_in_tariff * -grid_kWh
+                cost = 0
 
             data.at[index, 'simulation.PV.P'] = pv_power
             data.at[index, 'simulation.Battery.P'] = battery_power
@@ -123,18 +122,18 @@ simulations = [
 ]
 
 for pv_size in range(10, 45, 5):
-    for battery_size in range(10000, 60000, 10000):
-        for feed_in_tariff in [7, 14, 21]:
-            simulations.append({
-                "name": "pv-%.2f-battery-%d-fit-%d" % (pv_size/10.0, battery_size, feed_in_tariff),
-                "multiply_PV": pv_size/10.0,
-                "battery_capacity": battery_size,
-                "export_limit": 5000,
-                "battery_charge_limit": 7000 if battery_size > 1000 else 4000,
-                "battery_discharge_limit": 7000 if battery_size > 1000 else 4000,
-                "battery_soc_min": 20,
-                "feed_in_tariff": feed_in_tariff
-            })
+    for battery_size in range(10000, 210000, 40000):
+        # for feed_in_tariff in [7, 14, 21]:
+        simulations.append({
+            "name": "pv-%.2f-battery-%d" % (pv_size/10.0, battery_size),
+            "multiply_PV": pv_size/10.0,
+            "battery_capacity": battery_size,
+            "export_limit": 5000,
+            "battery_charge_limit": 7000 if battery_size > 1000 else 4000,
+            "battery_discharge_limit": 7000 if battery_size > 1000 else 4000,
+            "battery_soc_min": 20,
+            # "feed_in_tariff": feed_in_tariff
+        })
 
 if __name__ == "__main__":
     print("Loading data")
@@ -146,11 +145,10 @@ if __name__ == "__main__":
         name = simulation.pop('name')
         print("Running simulation '%s'" % name)
         simulated_data = simulator.simulate(**simulation)
-        stats = simulation_stats(simulated_data)
+        stats = dataset_stats(simulated_data)
         stats['name'] = name
         stats['PV-size'] = simulation['multiply_PV']
         stats['battery-size'] = simulation['battery_capacity']
-        stats['fit'] = simulation.get('feed_in_tariff', 7)
         overall_stats.append(stats)
         simulated_data.to_hdf(os.path.join(output_directory, "simulation-%s.h5" % name), 'table')
         # # Convert to a mean day
