@@ -120,6 +120,7 @@ simulations = [
         "battery_soc_min": 20
     }
 ]
+simulations = []
 
 for pv_size in range(10, 45, 5):
     for battery_size in range(10000, 210000, 40000):
