@@ -122,7 +122,7 @@ simulations = [
 ]
 simulations = []
 
-for pv_size in range(10, 45, 5):
+for pv_size in range(5, 45, 5):
     for battery_size in range(10000, 110000, 20000):
         # for feed_in_tariff in [7, 14, 21]:
         simulations.append({
