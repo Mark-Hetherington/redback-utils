@@ -6,6 +6,8 @@ from tariffs import POWERSHOP_EV_TARIFF
 from utils import load_all_json_data, load_json, resample_dataframe, kW_series_to_kWh, print_progress_bar, \
     load_all_byminute_data, load_interpolated_byminute_data, dataset_stats
 
+import concurrent.futures
+
 
 class Simulator:
     data = None
@@ -15,7 +17,8 @@ class Simulator:
 
 
     def simulate(self, multiply_PV=None, battery_capacity=None, export_limit=None, battery_charge_limit=None,
-                 battery_discharge_limit=None, battery_soc_min=None, tariffs=None, feed_in_tariff=None):
+                 battery_discharge_limit=None, battery_soc_min=None, tariffs=None, feed_in_tariff=None, name=None):
+        print("Running simulation '%s'" % name)
         multiply_PV = multiply_PV or 2  # Increase solar by a factor of 2
         battery_capacity = battery_capacity or 10000  # Set battery capacity at 50kwh
         export_limit = export_limit or 5000  # Export limit is 5kw
@@ -79,9 +82,9 @@ class Simulator:
             data.at[index, 'simulation.self_sufficiency'] = min(max((row['ACLoad.P'] + grid_power) / row['ACLoad.P'],0), 1) \
                 if grid_power else None
             row_index += 1
-            print_progress_bar(row_index, row_total)
+            # print_progress_bar(row_index, row_total)
 
-        return data
+        return name, data
 
 
 simulations = [
@@ -141,23 +144,27 @@ for pv_size in range(5, 45, 5):
 if __name__ == "__main__":
     print("Running %d simulations" % len(simulations))
     print("Loading data")
-    data = load_interpolated_byminute_data()
+    data = load_all_json_data(2)
     # data = load_all_json_data(limit=10)
-    simulator = Simulator(data)
     overall_stats = []
-    for simulation in simulations:
-        name = simulation.pop('name')
-        print("Running simulation '%s'" % name)
-        simulated_data = simulator.simulate(**simulation)
-        stats = dataset_stats(simulated_data)
-        stats['name'] = name
-        stats['PV-size'] = simulation['multiply_PV']
-        stats['battery-size'] = simulation['battery_capacity']
-        overall_stats.append(stats)
-        simulated_data.to_hdf(os.path.join(output_directory, "simulation-%s.h5" % name), 'table')
-        # # Convert to a mean day
-        simulated_data = simulated_data.groupby(data.index.time).mean()
-        simulated_data.to_hdf(os.path.join(output_directory, "simulation-mean-day-%s.h5" % name), 'table')
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = []
+        for simulation in simulations:
+            simulator = Simulator(data)
+            futures.append(executor.submit(simulator.simulate, **simulation))
+        for future in concurrent.futures.as_completed(futures):
+            name, simulated_data = future.result()
+            print("finished %s" % name)
+            stats = dataset_stats(simulated_data)
+            stats['name'] = name
+            stats['PV-size'] = simulation['multiply_PV']
+            stats['battery-size'] = simulation['battery_capacity']
+            overall_stats.append(stats)
+            simulated_data.to_hdf(os.path.join(output_directory, "simulation-%s.h5" % name), 'table')
+            # # Convert to a mean day
+            simulated_data = simulated_data.groupby(data.index.time).mean()
+            simulated_data.to_hdf(os.path.join(output_directory, "simulation-mean-day-%s.h5" % name), 'table')
 
     stats_df = pandas.DataFrame(overall_stats)
     # stats_df.plot.scatter(x='PV-size', y='battery-size', c='cost')
