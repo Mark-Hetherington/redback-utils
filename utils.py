@@ -138,10 +138,13 @@ def dataset_stats(data):
         }
     if 'simulation.cost' in data:
         stats['cost'] = data['simulation.cost'].sum()/100
+    if 'simulation.self_sufficiency' in data:
+        stats['self_sufficiency'] = data['simulation.self_sufficiency'].mean()
     print("PV generation: %d kWh" % stats['PV'])
     if 'spill' in stats:
         print("Total spill: %d kWh" % stats['spill'])
-    print("Total usage: %d kWh" % stats['consumption'])
+    if 'self_sufficiency' in stats:
+        print("Self Sufficiency (by minute): %.2f %%" % (stats['self_sufficiency']*100))
     print("Total exports: %d kWh" % stats['exports'])
     print("Total imports: %d kWh" % stats['imports'])
     if 'cost' in stats:

@@ -76,6 +76,8 @@ class Simulator:
             data.at[index, 'simulation.Grid.P'] = grid_power
             data.at[index, 'simulation.Spill.P'] = pv_spill
             data.at[index, 'simulation.cost'] = cost
+            data.at[index, 'simulation.self_sufficiency'] = min(max((row['ACLoad.P'] + grid_power) / row['ACLoad.P'],0), 1) \
+                if grid_power else None
             row_index += 1
             print_progress_bar(row_index, row_total)
 
