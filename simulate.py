@@ -144,7 +144,7 @@ for pv_size in range(5, 45, 5):
 if __name__ == "__main__":
     print("Running %d simulations" % len(simulations))
     print("Loading data")
-    data = load_all_json_data(2)
+    data = load_interpolated_byminute_data()
     # data = load_all_json_data(limit=10)
     overall_stats = []
 
