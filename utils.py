@@ -126,19 +126,22 @@ def dataset_stats(data):
             "PV": kW_series_to_kWh(data['simulation.PV.P']),
             'spill': kW_series_to_kWh(data['simulation.Spill.P']),
             'exports': kW_series_to_kWh(data['simulation.Grid.P'].clip(lower=0)),
-            'imports': kW_series_to_kWh(data['simulation.Grid.P'].clip(upper=0))
+            'imports': kW_series_to_kWh(data['simulation.Grid.P'].clip(upper=0)),
+            'consumption': kW_series_to_kWh(data['ACLoad.P'])
         }
     else:
         stats = {
             "PV": kW_series_to_kWh(data['PV.P']),
             'exports': kW_series_to_kWh(data['Grid.P'].clip(lower=0)),
-            'imports': kW_series_to_kWh(data['Grid.P'].clip(upper=0))
+            'imports': kW_series_to_kWh(data['Grid.P'].clip(upper=0)),
+            'consumption': kW_series_to_kWh(data['ACLoad.P'])
         }
     if 'simulation.cost' in data:
         stats['cost'] = data['simulation.cost'].sum()/100
     print("PV generation: %d kWh" % stats['PV'])
     if 'spill' in stats:
         print("Total spill: %d kWh" % stats['spill'])
+    print("Total usage: %d kWh" % stats['consumption'])
     print("Total exports: %d kWh" % stats['exports'])
     print("Total imports: %d kWh" % stats['imports'])
     if 'cost' in stats:
